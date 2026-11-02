@@ -32,10 +32,13 @@ public class SafeBankTransaction {
         account.setPin(request.getPin());
         account.setAccountNumber(generateAccountNumber());
 
-        BigDecimal openingBalance = request.getOpeningBalance();
-        account.deposit(openingBalance);
-
         accounts.add(account);
+        BigDecimal openingBalance = request.getOpeningBalance();
+
+        if (openingBalance.compareTo(BigDecimal.ZERO) > 0) {
+            deposit(account.getAccountNumber(), openingBalance);
+        }
+
         return account;
 
     }
@@ -46,21 +49,23 @@ public class SafeBankTransaction {
 
     public void deposit(String accountNumber, BigDecimal amount){
         Account account = findAccount(accountNumber);
-        Validation.validateAmount(amount);
+        Validation.validatePositiveAmount(amount);
         account.deposit(amount);
         Transaction transaction = new Transaction(LocalDateTime.now(), amount, TransactionType.DEPOSIT, accountNumber);
+        transaction.setTransactionId(account.generateTransactionId());
         account.addTransaction(transaction);
 
     }
 
     public void withdraw(String accountNumber, BigDecimal amount, String pin){
         Account account = findAccount(accountNumber);
-        Validation.validateAmount(amount);
+        Validation.validatePositiveAmount(amount);
         if(!pin.equals(account.getPin())) throw new IllegalArgumentException("Invalid pin");
         if(account.getBalance().compareTo(amount) < 0) throw new InsufficientFundsException("Insufficient funds");
         if(amount.compareTo(new BigDecimal("100000")) > 0) throw new WithdrawalLimitExceededException("Single withdrawal limit is ₦100,000");
         account.withdraw(amount);
         Transaction transaction = new Transaction(LocalDateTime.now(), amount, TransactionType.WITHDRAWAL, accountNumber);
+        transaction.setTransactionId(account.generateTransactionId());
         account.addTransaction(transaction);
 
     }
@@ -82,6 +87,8 @@ public class SafeBankTransaction {
                 return account;
         }throw new IllegalArgumentException("Account not found");
     }
+
+
 
 
 }

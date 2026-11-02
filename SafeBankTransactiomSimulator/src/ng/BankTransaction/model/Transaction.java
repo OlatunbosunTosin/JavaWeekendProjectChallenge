@@ -21,6 +21,10 @@ public class Transaction {
         return transactionId;
     }
 
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
+    }
+
     public String getAccountNumber() {
         return accountNumber;
     }
@@ -35,5 +39,17 @@ public class Transaction {
 
     public LocalDateTime getDateTime() {
         return dateTime;
+    }
+
+    @Override
+    public String toString() {
+        return "{" + '\n' +
+                " transactionId : " + transactionId + '\n' +
+                " accountNumber : " + accountNumber + '\n' +
+                " transactionType : " + transactionType + '\n' +
+                " amount : " + amount + '\n' +
+                " date : " + dateTime.toLocalDate() + '\n' +
+                " time : " + dateTime.toLocalTime() + '\n' +
+                '}';
     }
 }

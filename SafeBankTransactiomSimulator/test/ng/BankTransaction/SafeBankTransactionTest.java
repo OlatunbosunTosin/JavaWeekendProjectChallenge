@@ -107,4 +107,46 @@ public class SafeBankTransactionTest {
         assertThrows(WithdrawalLimitExceededException.class,()-> transaction.withdraw(acctNumber,new BigDecimal("120000"), "1234"));
     }
 
+    @Test
+    public void createAnAccountWithValidDetails_NonNumericInput_throwException(){
+        CreateAccountRequest request = new CreateAccountRequest();
+        request.setName("Ayo Dele");
+        request.setOpeningBalance(new BigDecimal("200000"));
+        request.setPin("1234");
+        Account account = transaction.CreateAccount(request);
+        String acctNumber = account.getAccountNumber();
+
+        assertThrows(IllegalArgumentException.class,()-> transaction.withdraw(acctNumber,new BigDecimal("a"), "1234"));
+    }
+
+    @Test
+    public void deposit10000_balanceIs10000_withdraw2000_balanceIs8000(){
+        CreateAccountRequest request = new CreateAccountRequest();
+        request.setName("Ayo Dele");
+        request.setOpeningBalance(new BigDecimal("10000"));
+        request.setPin("1234");
+        Account account = transaction.CreateAccount(request);
+        String acctNumber = account.getAccountNumber();
+        assertEquals(new BigDecimal("10000"), transaction.checkBalance(acctNumber, "1234"));
+        transaction.withdraw(acctNumber,new BigDecimal("2000"), "1234");
+        assertEquals(new BigDecimal("8000"), transaction.checkBalance(acctNumber, "1234"));
+
+    }
+
+    @Test
+    public void deposit10000_balanceIs10000_withdraw2000_balanceIs8000_transactionIs2(){
+        CreateAccountRequest request = new CreateAccountRequest();
+        request.setName("Ayo Dele");
+        request.setOpeningBalance(new BigDecimal("10000"));
+        request.setPin("1234");
+        Account account = transaction.CreateAccount(request);
+        String acctNumber = account.getAccountNumber();
+
+        assertEquals(new BigDecimal("10000"), account.getBalance());
+        transaction.withdraw(acctNumber,new BigDecimal("2000"), "1234");
+        assertEquals(new BigDecimal("8000"), account.getBalance());
+        assertEquals(2, account.getTransactions().size());
+
+    }
+
 }

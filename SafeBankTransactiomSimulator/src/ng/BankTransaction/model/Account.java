@@ -9,6 +9,7 @@ public class Account {
     private String pin;
     private BigDecimal balance = BigDecimal.ZERO;
     private String accountNumber;
+    private int transactionId;
     private final List<Transaction> transactions = new ArrayList<>();
 
     public String getName() {
@@ -53,5 +54,9 @@ public class Account {
 
     public void withdraw(BigDecimal amount) {
         this.balance = balance.subtract(amount);
+    }
+
+    public String generateTransactionId(){
+        return String.valueOf(++transactionId);
     }
 }
